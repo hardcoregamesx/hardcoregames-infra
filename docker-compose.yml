@@ -1,0 +1,51 @@
+services:
+  hc-django:
+    image: hc-django:latest
+    container_name: hc-django
+    restart: unless-stopped
+    env_file:
+      - ./hc-django.env
+    networks:
+      - n8n_evoapi
+      - hc-net
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=n8n_evoapi
+      - traefik.http.routers.hcdjango.rule=Host(`admin.srv936408.hstgr.cloud`) || Host(`admin.hardcoregames.co`)
+      - traefik.http.routers.hcdjango.entrypoints=web,websecure
+      - traefik.http.routers.hcdjango.tls.certresolver=mytlschallenge
+      - traefik.http.services.hcdjango.loadbalancer.server.port=8000
+  hc-fastapi:
+    image: hc-fastapi:latest
+    container_name: hc-fastapi
+    restart: unless-stopped
+    env_file:
+      - ./hc-fastapi.env
+    networks:
+      - n8n_evoapi
+      - hc-net
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=n8n_evoapi
+      - traefik.http.routers.hcapi.rule=Host(`api.srv936408.hstgr.cloud`) || Host(`api.hardcoregames.co`)
+      - traefik.http.routers.hcapi.entrypoints=web,websecure
+      - traefik.http.routers.hcapi.tls.certresolver=mytlschallenge
+      - traefik.http.services.hcapi.loadbalancer.server.port=8000
+  hc-frontend:
+    image: hc-frontend:latest
+    container_name: hc-frontend
+    restart: always
+    networks:
+      - n8n_evoapi
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=n8n_evoapi
+      - traefik.http.routers.hcfrontend.rule=Host(`www.hardcoregames.co`) || Host(`hardcoregames.co`)
+      - traefik.http.routers.hcfrontend.entrypoints=web,websecure
+      - traefik.http.routers.hcfrontend.tls.certresolver=mytlschallenge
+      - traefik.http.services.hcfrontend.loadbalancer.server.port=80
+networks:
+  n8n_evoapi:
+    external: true
+  hc-net:
+    external: true

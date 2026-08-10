@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik
+    image: traefik:v3.7.10
     command:
       - --api=true
       - --api.insecure=true
@@ -14,6 +14,17 @@ services:
       - --certificatesresolvers.mytlschallenge.acme.httpchallenge.entrypoint=web
       - --certificatesresolvers.mytlschallenge.acme.email=${SSL_EMAIL}
       - --certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.lestaging.acme.httpchallenge=true
+      - --certificatesresolvers.lestaging.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.lestaging.acme.email=${SSL_EMAIL}
+      - --certificatesresolvers.lestaging.acme.storage=/letsencrypt/acme-staging.json
+      - --certificatesresolvers.lestaging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.acmestagingtest.rule=Host(`srv936408.hstgr.cloud`)
+      - traefik.http.routers.acmestagingtest.entrypoints=websecure
+      - traefik.http.routers.acmestagingtest.tls.certresolver=lestaging
+      - traefik.http.routers.acmestagingtest.service=noop@internal
     restart: always
     ports:
       - 80:80

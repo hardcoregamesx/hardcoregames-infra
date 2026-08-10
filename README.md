@@ -61,9 +61,24 @@ fallback.
 - El redirect global `web` -> `websecure` no rompe HTTP-01: Traefik atiende
   `/.well-known/acme-challenge/` antes del middleware de redirect.
 
+## Canario de HTTP-01
+
+El resolver `lestaging` apunta al directorio de staging de Let's Encrypt y
+guarda en `/letsencrypt/acme-staging.json`, archivo distinto del de produccion.
+El router `acmestagingtest` lo usa sobre `Host(srv936408.hstgr.cloud)` con
+`service=noop@internal`: ningun cliente visita ese hostname.
+
+Validado el 2026-08-10: staging emitio el certificado correctamente, lo que
+demuestra que Let's Encrypt alcanza el puerto 80 desde fuera y que el redirect
+global `web` -> `websecure` no tapa `/.well-known/acme-challenge/`.
+
+Se deja puesto a proposito, como canario permanente. Quitarlo costaria otra
+recreacion de Traefik, que tumba TODO el stack unos segundos, a cambio de nada.
+Ese hostname sirve un certificado de staging, asi que un navegador avisara si
+alguien entra: es lo esperado.
+
 ## Pendiente
 
-- `traefik-n8n/docker-compose.yml` usa `image: traefik` sin tag. Fijar version.
 - `--api.insecure=true` expone el dashboard en el puerto 8080 dentro de
   `n8n_evoapi`. No esta publicado al host, pero cualquier contenedor de esa red
   lo alcanza.

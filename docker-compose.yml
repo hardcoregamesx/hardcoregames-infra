@@ -48,6 +48,13 @@ services:
       - traefik.http.routers.hcfrontend.entrypoints=web,websecure
       - traefik.http.routers.hcfrontend.tls.certresolver=mytlschallenge
       - traefik.http.services.hcfrontend.loadbalancer.server.port=80
+    volumes:
+      # SEO: sitemap y snapshots de prerender regenerados a diario por
+      # scripts/regenerate-seo.sh (repo del frontend) sin rebuild de imagen.
+      # Publicar SIEMPRE preservando inodes (rsync --delete / cat >), nunca
+      # mv/rm sobre estos paths: el bind-mount fija el inode original.
+      - /opt/hardcoregames/seo/sitemap.xml:/usr/share/nginx/html/sitemap.xml:ro
+      - /opt/hardcoregames/seo/prerender:/usr/share/nginx/html/prerender:ro
 networks:
   n8n_evoapi:
     external: true

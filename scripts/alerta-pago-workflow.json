@@ -1,0 +1,44 @@
+{
+  "id": "AlertaPagoCaido1",
+  "name": "Alerta pago caido",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alerta-pago",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "8f2a1c30-1a11-4f01-9a01-aa0000000001",
+      "name": "Webhook alerta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "8f2a1c30-1a11-4f01-9a01-aa0000000001"
+    },
+    {
+      "parameters": {
+        "chatId": "1816790307",
+        "text": "={{ $json.body.text }}",
+        "additionalFields": {}
+      },
+      "id": "8f2a1c30-1a11-4f01-9a01-aa0000000002",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [260, 0],
+      "credentials": {
+        "telegramApi": {
+          "id": "KlEsW4Z2qYsMHXv7",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook alerta": {
+      "main": [[{ "node": "Telegram", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

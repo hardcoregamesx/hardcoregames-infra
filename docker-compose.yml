@@ -68,6 +68,19 @@ services:
       # mv/rm sobre estos paths: el bind-mount fija el inode original.
       - /opt/hardcoregames/seo/sitemap.xml:/usr/share/nginx/html/sitemap.xml:ro
       - /opt/hardcoregames/seo/prerender:/usr/share/nginx/html/prerender:ro
+  hc-frontend-v2:
+    image: hc-frontend-v2:latest
+    container_name: hc-frontend-v2
+    restart: unless-stopped
+    networks:
+      - n8n_evoapi
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=n8n_evoapi
+      - traefik.http.routers.hcfrontendv2.rule=Host(`frontendv2.srv936408.hstgr.cloud`)
+      - traefik.http.routers.hcfrontendv2.entrypoints=web,websecure
+      - traefik.http.routers.hcfrontendv2.tls.certresolver=mytlschallenge
+      - traefik.http.services.hcfrontendv2.loadbalancer.server.port=3000
 networks:
   n8n_evoapi:
     external: true

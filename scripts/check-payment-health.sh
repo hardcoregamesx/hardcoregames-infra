@@ -59,7 +59,7 @@ if [ "$CODE_CO" != "200" ]; then
 "
 fi
 
-BUNDLE=$(curl -s -m 20 "https://www.hardcoregames.co/" | grep -o 'assets/index-[^"]*\.js' | head -1)
+BUNDLE=$(curl -s -m 20 "https://www.hardcoregames.co/" | grep -oE 'assets/index-[^"]*\.js|_next/static/chunks/[^"]*\.js' | head -1)
 if [ -n "$BUNDLE" ]; then
   CODE_JS=$(curl -s -o /dev/null -w '%{http_code}' -m 20 "https://www.hardcoregames.co/$BUNDLE")
   if [ "$CODE_JS" != "200" ]; then

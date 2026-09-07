@@ -99,16 +99,10 @@ services:
       - traefik.http.routers.hcfrontendv2.entrypoints=web,websecure
       - traefik.http.routers.hcfrontendv2.tls.certresolver=mytlschallenge
       - traefik.http.services.hcfrontendv2.loadbalancer.server.port=3000
-      # Staging (05/09/2026): mismo servicio, pero con X-Robots-Tag: noindex
-      # para que Google no indexe el dominio de pruebas como contenido
-      # duplicado del real. La cabecera va aqui (Traefik), no en el codigo,
-      # para que el codigo que se despliega a produccion no lleve noindex.
-      - traefik.http.middlewares.hcfrontendv2-noindex.headers.customresponseheaders.X-Robots-Tag=noindex, nofollow
-      - traefik.http.routers.hcfrontendv2-staging.rule=Host(`frontendv2.srv936408.hstgr.cloud`)
-      - traefik.http.routers.hcfrontendv2-staging.entrypoints=web,websecure
-      - traefik.http.routers.hcfrontendv2-staging.tls.certresolver=mytlschallenge
-      - traefik.http.routers.hcfrontendv2-staging.service=hcfrontendv2
-      - traefik.http.routers.hcfrontendv2-staging.middlewares=hcfrontendv2-noindex
+      # Subdominio de staging frontendv2.srv936408.hstgr.cloud eliminado
+      # (2026-09-07): cumplio su proposito de preview antes del corte a v2
+      # y hoy era un alias redundante del mismo servicio que ya sirve
+      # www.hardcoregames.co en produccion.
 networks:
   n8n_evoapi:
     external: true

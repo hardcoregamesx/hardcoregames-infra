@@ -49,10 +49,28 @@ services:
       # duplicados). El sitemap y el <link canonical> del prerender ya
       # apuntaban a www, asi que el apex ahora hace 301 hacia www en vez de
       # servir directo.
-      - traefik.http.routers.hcfrontend.rule=Host(`www.hardcoregames.co`)
-      - traefik.http.routers.hcfrontend.entrypoints=web,websecure
-      - traefik.http.routers.hcfrontend.tls.certresolver=mytlschallenge
+      # CORTE AL V2: el dominio lo sirve hc-frontend-v2. Este contenedor
+      # se queda solo con las rutas estaticas que viven en su nginx
+      # (landings de campana, /fisicos, /rewards, la pagina legal) y con
+      # los dos widgets JS que esas landings cargan y que el v2 no tiene.
+      # La prioridad explicita evita depender del orden por longitud.
+      - traefik.http.routers.hclandings.rule=Host(`www.hardcoregames.co`) && (PathPrefix(`/fc27`) || PathPrefix(`/gamepassultimate`) || PathPrefix(`/psplus`) || PathPrefix(`/grandtheftautovi`) || PathPrefix(`/fisicos`) || PathPrefix(`/rewards`) || PathPrefix(`/politica-tratamiento-datos`) || Path(`/assets/rewards-widget.js`) || Path(`/assets/sorteos-widget.js`) || Path(`/logo.png`) || Path(`/placeholder.svg`) || Path(`/image.png`))
+      - traefik.http.routers.hclandings.priority=100
+      - traefik.http.routers.hclandings.entrypoints=web,websecure
+      - traefik.http.routers.hclandings.tls.certresolver=mytlschallenge
+      - traefik.http.routers.hclandings.service=hcfrontend
       - traefik.http.services.hcfrontend.loadbalancer.server.port=80
+      # Redirect puntual aprobado (2026-09-07): /politica-datos nunca existio
+      # como pagina real; el slug correcto es /politica-tratamiento-datos.
+      - traefik.http.middlewares.hcpoliticadatosredirect.redirectregex.regex=^https?://(www\.)?hardcoregames\.co/politica-datos/?$$
+      - traefik.http.middlewares.hcpoliticadatosredirect.redirectregex.replacement=https://www.hardcoregames.co/politica-tratamiento-datos
+      - traefik.http.middlewares.hcpoliticadatosredirect.redirectregex.permanent=true
+      - traefik.http.routers.hcpoliticadatosredirect.rule=(Host(`www.hardcoregames.co`) || Host(`hardcoregames.co`)) && (Path(`/politica-datos`) || Path(`/politica-datos/`))
+      - traefik.http.routers.hcpoliticadatosredirect.priority=200
+      - traefik.http.routers.hcpoliticadatosredirect.entrypoints=web,websecure
+      - traefik.http.routers.hcpoliticadatosredirect.tls.certresolver=mytlschallenge
+      - traefik.http.routers.hcpoliticadatosredirect.middlewares=hcpoliticadatosredirect
+      - traefik.http.routers.hcpoliticadatosredirect.service=hcfrontend
       - traefik.http.middlewares.hcfrontend-apex-redirect.redirectregex.regex=^https?://hardcoregames\.co/(.*)
       - traefik.http.middlewares.hcfrontend-apex-redirect.redirectregex.replacement=https://www.hardcoregames.co/$${1}
       - traefik.http.middlewares.hcfrontend-apex-redirect.redirectregex.permanent=true
@@ -77,10 +95,20 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=n8n_evoapi
-      - traefik.http.routers.hcfrontendv2.rule=Host(`frontendv2.srv936408.hstgr.cloud`)
+      - traefik.http.routers.hcfrontendv2.rule=Host(`www.hardcoregames.co`)
       - traefik.http.routers.hcfrontendv2.entrypoints=web,websecure
       - traefik.http.routers.hcfrontendv2.tls.certresolver=mytlschallenge
       - traefik.http.services.hcfrontendv2.loadbalancer.server.port=3000
+      # Staging (05/09/2026): mismo servicio, pero con X-Robots-Tag: noindex
+      # para que Google no indexe el dominio de pruebas como contenido
+      # duplicado del real. La cabecera va aqui (Traefik), no en el codigo,
+      # para que el codigo que se despliega a produccion no lleve noindex.
+      - traefik.http.middlewares.hcfrontendv2-noindex.headers.customresponseheaders.X-Robots-Tag=noindex, nofollow
+      - traefik.http.routers.hcfrontendv2-staging.rule=Host(`frontendv2.srv936408.hstgr.cloud`)
+      - traefik.http.routers.hcfrontendv2-staging.entrypoints=web,websecure
+      - traefik.http.routers.hcfrontendv2-staging.tls.certresolver=mytlschallenge
+      - traefik.http.routers.hcfrontendv2-staging.service=hcfrontendv2
+      - traefik.http.routers.hcfrontendv2-staging.middlewares=hcfrontendv2-noindex
 networks:
   n8n_evoapi:
     external: true

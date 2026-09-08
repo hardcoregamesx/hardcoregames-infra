@@ -54,7 +54,7 @@ services:
       # (landings de campana, /fisicos, /rewards, la pagina legal) y con
       # los dos widgets JS que esas landings cargan y que el v2 no tiene.
       # La prioridad explicita evita depender del orden por longitud.
-      - traefik.http.routers.hclandings.rule=Host(`www.hardcoregames.co`) && (PathPrefix(`/fc27`) || PathPrefix(`/gamepassultimate`) || PathPrefix(`/psplus`) || PathPrefix(`/grandtheftautovi`) || PathPrefix(`/fisicos`) || PathPrefix(`/rewards`) || PathPrefix(`/politica-tratamiento-datos`) || Path(`/assets/rewards-widget.js`) || Path(`/assets/sorteos-widget.js`) || Path(`/logo.png`) || Path(`/placeholder.svg`) || Path(`/image.png`))
+      - traefik.http.routers.hclandings.rule=Host(`www.hardcoregames.co`) && (PathPrefix(`/fc27`) || PathPrefix(`/gamepassultimate`) || PathPrefix(`/psplus`) || PathPrefix(`/grandtheftautovi`) || PathPrefix(`/fisicos`) || PathPrefix(`/rewards`) || Path(`/assets/rewards-widget.js`) || Path(`/assets/sorteos-widget.js`) || Path(`/logo.png`) || Path(`/placeholder.svg`) || Path(`/image.png`))
       - traefik.http.routers.hclandings.priority=100
       - traefik.http.routers.hclandings.entrypoints=web,websecure
       - traefik.http.routers.hclandings.tls.certresolver=mytlschallenge

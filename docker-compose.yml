@@ -90,6 +90,7 @@ services:
     image: hc-frontend-v2:latest
     container_name: hc-frontend-v2
     restart: unless-stopped
+    env_file: ./hc-frontend-v2.env
     networks:
       - n8n_evoapi
     labels:
